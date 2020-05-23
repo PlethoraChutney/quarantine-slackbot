@@ -73,6 +73,8 @@ def process_request():
         event_type = slack_event['event']['type']
 
         return _event_handler(event_type, slack_event)
+    else:
+        return 'Hello world!'
 
 
 
