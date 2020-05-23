@@ -39,7 +39,7 @@ def _event_handler(event_type, slack_event):
     team_id = slack_event['team_id']
 
     if event_type == 'message':
-        if slack_event['event']['user'] != 'U014JNM89RP':
+        if 'bot_id' not in slack_event['event']:
             message_text = slack_event['event']['text'].lower()
             user_id = slack_event['event']['user']
             user_name = f'<@{user_id}>'
