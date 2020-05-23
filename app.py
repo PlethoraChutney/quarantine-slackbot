@@ -37,37 +37,27 @@ def check_in(direction, user_name, user_id):
             return f'Can\'t check out if you never came in, {user_name}'
 
 def _event_handler(event_type, slack_event):
-    print(slack_event)
     team_id = slack_event['team_id']
 
-    if event_type == 'app_mention':
-        ts = slack_event['event']['ts']
-        message_tail = slack_event['event']['text'][:-10]
-
-        response = slack_web_client.chat_postMessage(
-            channel = 'C013ZC50SPQ',
-            text = f'I\'m responding to the message that ended "{message_tail}"'
-        )
-        return make_response('Got the mention', 200,)
-
-    elif event_type == 'message':
+    if event_type == 'message':
         if slack_event['event']['user'] != 'U014JNM89RP':
             message_text = slack_event['event']['text'].lower()
             user_id = slack_event['event']['user']
             user_name = f'<@{user_id}>'
+            channel = slack_event['event']['channel']
             if 'who' in message_text:
                 response = slack_web_client.chat_postMessage(
-                    channel = 'C013ZC50SPQ',
+                    channel = channel,
                     text = who_in_lab()
                 )
             elif ' in' in message_text:
                 response = slack_web_client.chat_postMessage(
-                    channel = 'C013ZC50SPQ',
+                    channel = channel,
                     text = check_in('in', user_name, user_id)
                 )
             elif ' out' in message_text:
                 response = slack_web_client.chat_postMessage(
-                    channel = 'C013ZC50SPQ',
+                    channel = channel,
                     text = check_in('out', user_name, user_id)
                 )
 
@@ -89,7 +79,7 @@ def process_request():
 
 
 if __name__ == "__main__":
-    logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
-    logger.addHandler(logging.StreamHandler())
+    # logger = logging.getLogger()
+    # logger.setLevel(logging.DEBUG)
+    # logger.addHandler(logging.StreamHandler())
     app.run(port=3000)
