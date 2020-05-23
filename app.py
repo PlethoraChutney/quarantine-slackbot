@@ -4,9 +4,13 @@ from flask import Flask
 from slack import WebClient
 from slackeventsapi import SlackEventAdapter
 from quarantine_tracker import GotItMessage
+from flask_socketio import SocketIO
 
 app = Flask(__name__)
+server = app.server
 slack_events_adapter = SlackEventAdapter(os.environ['SLACK_SIGNING_SECRET'], "/slack/events", app)
+
+SocketIO(app, cors_allowed_origins='*')
 
 # Initialize a Web API client
 slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
@@ -14,6 +18,11 @@ slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 # App data
 members_in: []
 members_out: []
+
+
+@app.route('/')
+def hello():
+    return 'Hello world!'
 
 
 def got_it(user_id: str, channel: str):
@@ -35,9 +44,9 @@ def message(payload):
     channel_id = event.get("channel")
     user_id = event.get("user")
     text = event.get("text")
+    print('Got a message')
 
-    if text and text.lower() == "hello":
-        return got_it(user_id, channel_id)
+    return got_it(user_id, channel_id)
 
 
 if __name__ == "__main__":
@@ -45,8 +54,3 @@ if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
     logger.addHandler(logging.StreamHandler())
     app.run(port=3000)
-
-    import ssl as ssl_lib
-    import certifi
-
-    ssl_context = ssl_lib.create_default_context(cafile=certifi.where())
