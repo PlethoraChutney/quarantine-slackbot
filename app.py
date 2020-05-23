@@ -7,7 +7,6 @@ from quarantine_tracker import GotItMessage
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
-server = app.server
 slack_events_adapter = SlackEventAdapter(os.environ['SLACK_SIGNING_SECRET'], "/slack/events", app)
 
 SocketIO(app, cors_allowed_origins='*')
