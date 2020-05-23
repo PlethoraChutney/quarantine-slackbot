@@ -4,7 +4,6 @@ from flask import Flask, request, make_response, render_template
 from slack import WebClient
 from slack.errors import SlackApiError
 from slackeventsapi import SlackEventAdapter
-from quarantine_tracker import GotItMessage
 from flask_socketio import SocketIO
 
 app = Flask(__name__)
