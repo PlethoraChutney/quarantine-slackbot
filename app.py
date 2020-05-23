@@ -14,7 +14,7 @@ slack_events_adapter = SlackEventAdapter(os.environ['SLACK_SIGNING_SECRET'], "/s
 def who_in_lab(workspace):
     if not os.path.exists(workspace):
         os.makedirs(workspace)
-        
+
     present_members = ', '.join([f'<@{x}>' for x in os.listdir(workspace)])
     if present_members == '':
         present_members = 'nobody'
