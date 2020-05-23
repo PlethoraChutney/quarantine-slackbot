@@ -11,8 +11,8 @@ The purpose of this bot is twofold:
 
 ## Installation
 As of right now, making this app publicly distributible is more work than I want
-to do. So you'll have to [make your own Slack App](api.slack.com), and host this repo
-somewhere. I'm using a free [heroku](heroku.com) account and it works fine. Make
+to do. So you'll have to [make your own Slack App](https://api.slack.com), and host this repo
+somewhere. I'm using a free [heroku](https://www.heroku.com) account and it works fine. Make
 sure to give heroku the two environment variables, `SLACK_BOT_TOKEN` and
 `SLACK_SIGNING_SECRET`.
 
