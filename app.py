@@ -52,17 +52,20 @@ def _event_handler(event_type, slack_event):
                     text = who_in_lab()
                 )
             else:
-                payload = {'token': os.environ['SLACK_BOT_TOKEN'], 'user': user_id}
-                r = requests.get('https://slack.com/api/users.info', params = payload)
+                try:
+                    payload = {'token': os.environ['SLACK_BOT_TOKEN'], 'user': user_id}
+                    slack_web_client.users_identity
 
-                user_name = r['user']['name']
-                in_lab.append(user_name)
-                print(in_lab)
+                    user_name = r['user']['name']
+                    in_lab.append(user_name)
+                    print(in_lab)
 
-                response = slack_web_client.chat_postMessage(
-                    channel = 'C013ZC50SPQ',
-                    text = f'Got it, checking you in {user_name}'
-                )
+                    response = slack_web_client.chat_postMessage(
+                        channel = 'C013ZC50SPQ',
+                        text = f'Got it, checking you in {user_name}'
+                    )
+                except:
+                    pass
 
         return make_response('Read a message', 200, )
 
