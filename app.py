@@ -12,16 +12,29 @@ SocketIO(app, cors_allowed_origins='*')
 slack_web_client = WebClient(token=os.environ['SLACK_BOT_TOKEN'])
 slack_events_adapter = SlackEventAdapter(os.environ['SLACK_SIGNING_SECRET'], "/slack/events", app)
 
-
-in_lab = []
+if not os.path.exists('in_lab'):
+    os.makedirs('in_lab')
 
 def who_in_lab():
-    if in_lab:
-        present_members = ', '.join(in_lab)
-    else:
-        present_members = 'Nobody'
+    present_members = ', '.join([f'<@{x}>' for x in os.listdir('in_lab')])
+    if present_members == '':
+        present_members = 'nobody'
 
     return f'Here\'s who\'s in lab: {present_members}'
+
+def check_in(direction, user_name, user_id):
+    if direction == 'in':
+        if os.path.exists(os.path.join('in_lab', user_id)):
+            return f'I already had you present, {user_name}'
+        else:
+            open(os.path.join('in_lab', user_id), 'a').close()
+            return f'Got it, checking you in.\n{who_in_lab()}'
+    elif direction == 'out':
+        if os.path.exists(os.path.join('in_lab', user_id)):
+            os.remove(os.path.join('in_lab', user_id))
+            return f'Hope you got some good work done\n{who_in_lab()}'
+        else:
+            return f'Can\'t check out if you never came in, {user_name}'
 
 def _event_handler(event_type, slack_event):
     print(slack_event)
@@ -48,31 +61,15 @@ def _event_handler(event_type, slack_event):
                     text = who_in_lab()
                 )
             elif ' in' in message_text:
-                if user_name not in in_lab:
-                    in_lab.append(user_name)
-
-                    response = slack_web_client.chat_postMessage(
-                        channel = 'C013ZC50SPQ',
-                        text = f'Got it, checking you in.\n{who_in_lab()}'
-                    )
-                else:
-                    response = slack_web_client.chat_postMessage(
-                        channel = 'C013ZC50SPQ',
-                        text = f'I already had you as present, {user_name}'
-                    )
+                response = slack_web_client.chat_postMessage(
+                    channel = 'C013ZC50SPQ',
+                    text = check_in('in', user_name, user_id)
+                )
             elif ' out' in message_text:
-                if user_name in in_lab:
-                    in_lab.remove(user_name)
-
-                    response = slack_web_client.chat_postMessage(
-                        channel = 'C013ZC50SPQ',
-                        text = f'Hope you got some good work done\n{who_in_lab()}'
-                    )
-                else:
-                    response = slack_web_client.chat_postMessage(
-                        channel = 'C013ZC50SPQ',
-                        text = f'Can\'t check out if you never came in, {user_name}'
-                    )
+                response = slack_web_client.chat_postMessage(
+                    channel = 'C013ZC50SPQ',
+                    text = check_in('out', user_name, user_id)
+                )
 
         return make_response('Read a message', 200, )
 
